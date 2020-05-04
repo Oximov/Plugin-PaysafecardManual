@@ -1,0 +1,14 @@
+{
+    "id": "paysafecardmanual",
+    "name": "PaysafecardManual",
+    "description": "Plugin for Azuriom",
+    "version": "1.0.0",
+    "url": "https://azuriom.com",
+    "authors": [
+        "Azuriom"
+    ],
+    "providers": [
+        "\\Azuriom\\Plugin\\PaysafecardManual\\Providers\\PaysafecardManualServiceProvider",
+        "\\Azuriom\\Plugin\\PaysafecardManual\\Providers\\RouteServiceProvider"
+    ]
+}

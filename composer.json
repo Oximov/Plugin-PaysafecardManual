@@ -1,0 +1,13 @@
+{
+    "name": "azuriom/paysafecardmanual",
+    "type": "azuriom-plugin",
+    "description": "Plugin for Azuriom",
+    "autoload": {
+        "psr-4": {
+            "Azuriom\\Plugin\\PaysafecardManual\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    }
+}
