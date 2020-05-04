@@ -1,6 +1,6 @@
 @extends('admin.layouts.admin')
 
-@section('title', 'Admin plugin home')
+@section('title', 'Paysafecard Manual')
 
 @section('content')
     <div class="card shadow mb-4">

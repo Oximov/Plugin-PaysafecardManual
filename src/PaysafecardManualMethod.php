@@ -32,62 +32,8 @@ class PaysafecardManualMethod extends PaymentMethod
 
     public function notification(Request $request, ?string $paymentId)
     {
-        if (! $request->has('code') || ! $request->has('custom')) {
-            return response()->json(['status' => 'error', 'message' => 'No code or no custom']);
-        }
 
-        $code = $request->input('code');
-        $publicKey = $this->gateway->data['public-key'];
-        $privateKey = $this->gateway->data['private-key'];
-
-        if ($privateKey !== $request->input('privateKey')) {
-            logger()->warning('[Shop] Dedipass - Invalid private key: '.$request->input('privateKey'));
-
-            return response()->json(['status' => 'error', 'message' => 'Invalid private key']);
-        }
-
-        if (Payment::where('payment_id', $code)->where('created_at', '>', now()->subMinute())->exists()) {
-            //logger()->warning('[Shop] Dedipass - Payment already completed: '.$code);
-
-            return response()->json(['status' => 'success', 'message' => 'Payment already completed']);
-        }
-
-        // TODO Dedipass API is broken when using IPN, so we can't verify the request...
-        //$url = "http://api.dedipass.com/v1/pay/?public_key={$publicKey}&private_key=$privateKey&code={$code}";
-        //$response = (new Client())->post($url);
-
-        $status = $request->input('status');
-
-        if ($status !== 'success') {
-            logger()->warning('[Shop] Dedipass - Invalid status: '.$status);
-
-            return response()->json(['status' => 'error', 'message' => 'Invalid status']);
-        }
-
-        $price = $request->input('payout', 0);
-        $money = $request->input('virtual_currency', 0);
-
-        $user = User::find($request->input('custom'));
-
-        if ($user === null) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid user id']);
-        }
-
-        $user->addMoney($money);
-        $user->save();
-
-        Payment::forceCreate([
-            'user_id' => $user->id,
-            'price' => $price,
-            'currency' => 'EUR',
-            'payment_type' => $this->id,
-            'status' => 'DELIVERED',
-            'items' => 'Money: '.$money,
-            'payment_id' => $code,
-            'type' => 'offers',
-        ]);
-
-        return response()->json(['status' => 'success']);
+        return response()->json(['status' => 'Not implemented.']);
     }
 
     public function success(Request $request)

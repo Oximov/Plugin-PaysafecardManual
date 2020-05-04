@@ -4,11 +4,6 @@
 
 @section('content')
     <div class="container content">
-        @if(Session::has('success'))
-            <div class="alert alert-success">
-                {{ Session::get('success')}}
-            </div>
-        @endif
     <form action="{{ route('paysafecardmanual.pay') }}" method="post">
         @csrf
         <input type="text" name="code">

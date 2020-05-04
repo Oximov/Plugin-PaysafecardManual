@@ -1,3 +1,3 @@
 <div class="alert alert-info">
-    @lang('dedipasspayment::messages.setup', ['url' => '<code>'.route('shop.payments.notification', 'dedipass').'</code>'])
-</div>
+    This plugin requires you to confirm each payments by using the code in you PaysafeCard account.
+ </div>
