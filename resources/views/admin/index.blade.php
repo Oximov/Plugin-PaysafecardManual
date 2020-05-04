@@ -31,7 +31,22 @@
                             <td>{{ $payment->payment_id }}</td>
                             <td>{{ format_date_compact($payment->created_at) }}</td>
                             <td>
-                                <form action="{{ route('paysafecardmanual.admin.accept_payment', ['payment' => $payment->id]) }}" method="post"> @csrf <button type="submit"  class="btn btn-success">Accept</button></form>
+                                <form action="{{ route('paysafecardmanual.admin.accept_payment', ['payment' => $payment->id]) }}" method="post">
+                                    @csrf 
+                                    @php
+                                        $money = 0;
+                                        foreach($offers as $offer){
+                                            foreach($payment->items as $id => $quantity){
+                                                if($id == $offer->id){
+                                                    $money += $offer->money * $quantity;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    @endphp
+                                    <input type="text" name="money" value="{{ $money }}">
+                                    <button type="submit"  class="btn btn-success">Accept</button>
+                                </form>
                                 <form action="{{ route('paysafecardmanual.admin.refuse_payment', ['payment' => $payment->id]) }}" method="post"> @csrf <button type="submit"  class="btn btn-danger">Refuse</button></form>
                             </td>
                         </tr>

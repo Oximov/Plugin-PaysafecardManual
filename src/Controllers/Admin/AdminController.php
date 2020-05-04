@@ -3,6 +3,7 @@
 namespace Azuriom\Plugin\PaysafecardManual\Controllers\Admin;
 
 use Azuriom\Plugin\Shop\Models\Offer;
+use Azuriom\Plugin\Shop\Models\Gateway;
 use Azuriom\Plugin\Shop\Models\Payment;
 use Azuriom\Http\Controllers\Controller;
 
@@ -20,16 +21,18 @@ class AdminController extends Controller
             ['payment_type', '=','paysafecardmanual']
         ])->get();
 
-        return view('paysafecardmanual::admin.index', ['payments'=>$payments]);
+        $gateway = Gateway::where('type', '=', 'paysafecardmanual')->first();
+        $offers = $gateway->offers;
+        
+
+        return view('paysafecardmanual::admin.index', ['payments'=>$payments, 'offers'=>$offers]);
     }
 
     public function accept_payment(Payment $payment)
     {
         $user = $payment->user;
-        foreach ($payment->items as $id => $quantity) {
-            $offer = Offer::find($id);
-            $user->money = $user->money + ($offer->money * $quantity);
-        }
+        $money = request()->input('money');
+        $user->money +=  $money;
         
         $payment->status = 'DELIVERED';
 
@@ -42,7 +45,7 @@ class AdminController extends Controller
             ['payment_type', '=','paysafecardmanual']
         ])->get();
 
-        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Points credited to '.$user->name]);
+        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Points credited to '.$user->name.' for : '.$money]);
     }
 
     public function refuse_payment(Payment $payment)
@@ -51,6 +54,6 @@ class AdminController extends Controller
         $payment->save();
         //TODO notify user mail or database
         
-        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Payment refused to '.$user->name]);
+        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Payment refused to '.$payment->user->name]);
     }
 }
