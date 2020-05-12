@@ -22,7 +22,8 @@ class AdminController extends Controller
         ])->get();
 
         $gateway = Gateway::where('type', '=', 'paysafecardmanual')->first();
-        $offers = $gateway->offers;
+        
+        $offers = $gateway ? $gateway->offers : null;
         
 
         return view('paysafecardmanual::admin.index', ['payments'=>$payments, 'offers'=>$offers]);
