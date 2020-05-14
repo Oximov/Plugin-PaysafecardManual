@@ -105,10 +105,10 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
     {
         return [
             'paysafecardmanual' => [
-                'name' => 'PaysafeCard Manual ('.count(Payment::where([
+                'name' => 'PaysafeCard Manual ('.Payment::where([
                     ['status', '=', 'PENDING'],
                     ['payment_type', '=','paysafecardmanual']
-                ])->get()).')',
+                ])->count().')',
                 'type' => 'dropdown',
                 'icon' => 'fas fa-chart-bar',
                 'items' => [
