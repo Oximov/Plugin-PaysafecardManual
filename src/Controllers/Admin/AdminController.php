@@ -6,6 +6,7 @@ use Azuriom\Plugin\Shop\Models\Offer;
 use Azuriom\Plugin\Shop\Models\Gateway;
 use Azuriom\Plugin\Shop\Models\Payment;
 use Azuriom\Http\Controllers\Controller;
+use Azuriom\Plugin\Shop\Events\PaymentPaid;
 
 class AdminController extends Controller
 {
@@ -36,17 +37,13 @@ class AdminController extends Controller
         $user->money +=  $money;
         
         $payment->status = 'DELIVERED';
-
+        
         $user->save();
         $payment->save();
         //TODO notify user mail or database
+        event(new PaymentPaid($payment));
 
-        $payments = Payment::where([
-            ['status', '=', 'PENDING'],
-            ['payment_type', '=','paysafecardmanual']
-        ])->get();
-
-        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Points credited to '.$user->name.' for : '.$money]);
+        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Points credited to '.$payment->user->name.' for : '.$money]);
     }
 
     public function refuse_payment(Payment $payment)
