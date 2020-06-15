@@ -32,6 +32,9 @@ class AdminController extends Controller
 
     public function accept_payment(Payment $payment)
     {
+        if($payment->status !== 'PENDING')
+            return redirect()->route('paysafecardmanual.admin.index')->with(['error'=>'Payment already DELIVERED/CANCELED. Current status : '.$payment->status]);
+        
         $user = $payment->user;
         $money = request()->input('money');
         $user->money +=  $money;
@@ -48,6 +51,9 @@ class AdminController extends Controller
 
     public function refuse_payment(Payment $payment)
     {
+        if($payment->status !== 'PENDING')
+            return redirect()->route('paysafecardmanual.admin.index')->with(['error'=>'Payment already DELIVERED/CANCELED. Current status : '.$payment->status]);
+            
         $payment->status = 'CANCELLED';
         $payment->save();
         //TODO notify user mail or database
