@@ -2,46 +2,14 @@
 
 namespace Azuriom\Plugin\PaysafecardManual\Providers;
 
-use Azuriom\Plugin\Shop\Models\Payment;
 use Azuriom\Extensions\Plugin\BasePluginServiceProvider;
 use Azuriom\Plugin\PaysafecardManual\PaysafecardManualMethod;
+use Azuriom\Plugin\Shop\Models\Payment;
+use Azuriom\Plugin\Shop\Models\PaymentItem;
+use Exception;
 
 class PaysafecardManualServiceProvider extends BasePluginServiceProvider
 {
-    /**
-     * The plugin's global HTTP middleware stack.
-     *
-     * @var array
-     */
-    protected $middleware = [
-        // \Azuriom\Plugin\PaysafecardManual\Middleware\ExampleMiddleware::class,
-    ];
-
-    /**
-     * The plugin's route middleware groups.
-     *
-     * @var array
-     */
-    protected $middlewareGroups = [];
-
-    /**
-     * The plugin's route middleware.
-     *
-     * @var array
-     */
-    protected $routeMiddleware = [
-        // 'example' => \Azuriom\Plugin\PaysafecardManual\Middleware\ExampleRouteMiddleware::class,
-    ];
-
-    /**
-     * The policy mappings for this plugin.
-     *
-     * @var array
-     */
-    protected $policies = [
-        // User::class => UserPolicy::class,
-    ];
-
     /**
      * Register any plugin services.
      *
@@ -50,7 +18,6 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
     public function register()
     {
         $this->registerMiddlewares();
-
         //
     }
 
@@ -63,8 +30,8 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
     {
         // $this->registerPolicies();
 
-        if (! plugins()->isEnabled('shop') || ! use_site_money()) {
-            logger()->warning('PaysafecardManual plugin needs the shop and using the site money plugin to work !');
+        if (! class_exists(PaymentItem::class) || ! plugins()->isEnabled('shop')) {
+            logger()->warning('PaysafecardManual plugin needs the shop plugin v0.2 or higher to work !');
 
             return;
         }
@@ -80,8 +47,6 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
         $this->registerAdminNavigation();
 
         payment_manager()->registerPaymentMethod('paysafecardmanual', PaysafecardManualMethod::class);
-
-        //
     }
 
     /**
@@ -103,16 +68,22 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
      */
     protected function adminNavigation()
     {
+        try {
+            $pendingPayments = Payment::pending()
+                ->where('transaction_id', 'paysafecardmanual')
+                ->count();
+        } catch (Exception $e) {
+            $pendingPayments = '?';
+        }
+
         return [
             'paysafecardmanual' => [
-                'name' => 'PaysafeCard Manual ('.Payment::where([
-                    ['status', '=', 'PENDING'],
-                    ['payment_type', '=','paysafecardmanual']
-                ])->count().')',
+                'name' => 'Paysafecard Manual ('.$pendingPayments.')',
                 'type' => 'dropdown',
                 'icon' => 'fas fa-chart-bar',
+                'route' => 'paysafecardmanual.admin.*',
                 'items' => [
-                    'paysafecardmanual.admin.index' => 'Wait list',
+                    'paysafecardmanual.admin.index' => 'paysafecardmanual::messages.nav.pending',
                 ],
             ],
         ];

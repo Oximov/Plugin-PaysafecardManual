@@ -16,5 +16,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'AdminController@index')->name('index');
 
-Route::post('/{payment}/accept_payment', 'AdminController@accept_payment')->name('accept_payment');
-Route::post('/{payment}/refuse_payment', 'AdminController@refuse_payment')->name('refuse_payment');
+Route::post('/{code}/accept', 'AdminController@accept')->name('accept');
+Route::post('/{code}/refuse', 'AdminController@refuse')->name('refuse');

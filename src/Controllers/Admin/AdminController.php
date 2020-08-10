@@ -2,11 +2,12 @@
 
 namespace Azuriom\Plugin\PaysafecardManual\Controllers\Admin;
 
-use Azuriom\Plugin\Shop\Models\Offer;
-use Azuriom\Plugin\Shop\Models\Gateway;
-use Azuriom\Plugin\Shop\Models\Payment;
 use Azuriom\Http\Controllers\Controller;
+use Azuriom\Notifications\AlertNotification;
+use Azuriom\Plugin\PaysafecardManual\Models\PendingCode;
 use Azuriom\Plugin\Shop\Events\PaymentPaid;
+use Azuriom\Plugin\Shop\Models\Payment;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -17,47 +18,59 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $payments = Payment::where([
-            ['status', '=', 'PENDING'],
-            ['payment_type', '=','paysafecardmanual']
-        ])->get();
-
-        $gateway = Gateway::where('type', '=', 'paysafecardmanual')->first();
-        
-        $offers = $gateway ? $gateway->offers : null;
-        
-
-        return view('paysafecardmanual::admin.index', ['payments'=>$payments, 'offers'=>$offers]);
+        return view('paysafecardmanual::admin.index', [
+            'codes' => PendingCode::all(),
+        ]);
     }
 
-    public function accept_payment(Payment $payment)
+    public function accept(Request $request, PendingCode $code)
     {
-        if($payment->status !== 'PENDING')
-            return redirect()->route('paysafecardmanual.admin.index')->with(['error'=>'Payment already DELIVERED/CANCELED. Current status : '.$payment->status]);
-        
-        $user = $payment->user;
-        $money = request()->input('money');
-        $user->money +=  $money;
-        
-        $payment->status = 'DELIVERED';
-        
-        $user->save();
-        $payment->save();
-        //TODO notify user mail or database
+        $this->validate($request, [
+            'price' => 'required|numeric|min:0',
+            'money' => 'required|numeric|min:0',
+        ]);
+
+        $price = $request->input('price');
+        $money = $request->input('money');
+
+        $payment = Payment::create([
+            'user_id' => $code->user_id,
+            'price' => $price,
+            'currency' => currency(),
+            'gateway_type' => 'paysafecard_manual',
+            'status' => 'completed',
+            'transaction_id' => $code,
+        ]);
+
+        $code->user->addMoney($money);
+
+        $code->forceDelete();
+
         event(new PaymentPaid($payment));
 
-        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Points credited to '.$payment->user->name.' for : '.$money]);
+        $notification = (new AlertNotification(trans('paysafecardmanual::messages.notifications.accepted', [
+            'money' => format_money($money),
+        ])));
+
+        $code->user->notifications()->create($notification->toArray());
+
+        return redirect()->route('paysafecardmanual.admin.index')->with([
+            'success' => trans('paysafecardmanual::messages.status.accepted'),
+        ]);
     }
 
-    public function refuse_payment(Payment $payment)
+    public function refuse(PendingCode $code)
     {
-        if($payment->status !== 'PENDING')
-            return redirect()->route('paysafecardmanual.admin.index')->with(['error'=>'Payment already DELIVERED/CANCELED. Current status : '.$payment->status]);
-            
-        $payment->status = 'CANCELLED';
-        $payment->save();
-        //TODO notify user mail or database
-        
-        return redirect()->route('paysafecardmanual.admin.index')->with(['success'=>'Payment refused to '.$payment->user->name]);
+        $code->delete();
+
+        $notification = (new AlertNotification(trans('paysafecardmanual::messages.notifications.refused', [
+            'code' => $code->code,
+        ])))->level('warning');
+
+        $code->user->notifications()->create($notification->toArray());
+
+        return redirect()->route('paysafecardmanual.admin.index')->with([
+            'success' => trans('paysafecardmanual::messages.status.refused'),
+        ]);
     }
 }

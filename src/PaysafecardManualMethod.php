@@ -26,14 +26,12 @@ class PaysafecardManualMethod extends PaymentMethod
 
     public function startPayment(Cart $cart, float $amount, string $currency)
     {
-        $payment = $this->createPayment($cart, $amount, $currency);
-        return view('paysafecardmanual::paysafecardmanual', ['payment_id' => $payment->id]);
+        return view('paysafecardmanual::pay');
     }
 
     public function notification(Request $request, ?string $paymentId)
     {
-
-        return response()->json(['status' => 'Not implemented.']);
+        return response()->noContent(404);
     }
 
     public function success(Request $request)
@@ -48,18 +46,16 @@ class PaysafecardManualMethod extends PaymentMethod
 
     public function rules()
     {
-        return [
-            
-        ];
+        return [];
     }
 
     public function image()
     {
-        return asset('plugins/paysafecardmanual/img/paysafe-card.png');
+        return asset('plugins/paysafecardmanual/img/paysafecard.svg');
     }
 
     public function hasFixedAmount()
     {
-        return false;
+        return true;
     }
 }
