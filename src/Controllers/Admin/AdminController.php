@@ -39,7 +39,7 @@ class AdminController extends Controller
             'currency' => currency(),
             'gateway_type' => 'paysafecard_manual',
             'status' => 'completed',
-            'transaction_id' => $code,
+            'transaction_id' => $code->code,
         ]);
 
         $code->user->addMoney($money);
