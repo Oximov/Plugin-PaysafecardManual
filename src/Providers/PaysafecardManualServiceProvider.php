@@ -7,6 +7,7 @@ use Azuriom\Plugin\PaysafecardManual\PaysafecardManualMethod;
 use Azuriom\Plugin\Shop\Models\Payment;
 use Azuriom\Plugin\Shop\Models\PaymentItem;
 use Exception;
+use Azuriom\Plugin\PaysafecardManual\Models\PendingCode;
 
 class PaysafecardManualServiceProvider extends BasePluginServiceProvider
 {
@@ -68,17 +69,9 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
      */
     protected function adminNavigation()
     {
-        try {
-            $pendingPayments = Payment::pending()
-                ->where('transaction_id', 'paysafecardmanual')
-                ->count();
-        } catch (Exception $e) {
-            $pendingPayments = '?';
-        }
-
         return [
             'paysafecardmanual' => [
-                'name' => 'Paysafecard Manual ('.$pendingPayments.')',
+                'name' => 'Paysafecard Manual ('.PendingCode::count().')',
                 'type' => 'dropdown',
                 'icon' => 'fas fa-chart-bar',
                 'route' => 'paysafecardmanual.admin.*',

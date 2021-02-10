@@ -8,6 +8,7 @@ use Azuriom\Plugin\PaysafecardManual\Models\PendingCode;
 use Azuriom\Plugin\Shop\Events\PaymentPaid;
 use Azuriom\Plugin\Shop\Models\Payment;
 use Illuminate\Http\Request;
+use Azuriom\Models\ActionLog;
 
 class AdminController extends Controller
 {
@@ -42,6 +43,8 @@ class AdminController extends Controller
             'transaction_id' => $code->code,
         ]);
 
+        ActionLog::log(trans('paysafecardmanual::messages.status.accepted').' ('.$price.' | '.$money.')', $code->user);
+
         $code->user->addMoney($money);
 
         $code->forceDelete();
@@ -66,6 +69,8 @@ class AdminController extends Controller
         $notification = (new AlertNotification(trans('paysafecardmanual::messages.notifications.refused', [
             'code' => $code->code,
         ])))->level('warning');
+        
+        ActionLog::log(trans('paysafecardmanual::messages.status.refused'), $code->user);
 
         $code->user->notifications()->create($notification->toArray());
 
