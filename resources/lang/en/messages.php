@@ -37,6 +37,12 @@ return [
         'refused' => 'Your paysafecard :code has been refused.',
     ],
 
+    'widget' => [
+        'pending' => 'A new PaySafeCard code is awaiting confirmation!',
+        'pin' => 'PaySafeCard code',
+        'user' => 'Users',
+    ],
+
     'info' => 'This plugin requires you to confirm each paysafecard payments manually.',
     'site_money' => 'In order to paysafecard manual to work, you must enable purchases with the site\'s money in the <a href=":url">shop\'s settings</a>.',
 ];
