@@ -38,9 +38,13 @@ return [
     ],
 
     'widget' => [
-        'pending' => 'A new PaySafeCard code is awaiting confirmation!',
+        'pending' => 'A new PaySafeCard code is awaiting confirmation !',
+        'accepted' => 'A PaySafeCard code has just been validated !',
+        'refused' => 'A PaySafeCard code has just been refused !',
         'pin' => 'PaySafeCard code',
         'user' => 'Users',
+        'money' => 'Payment amount',
+        'amount' => 'Reload amount',
     ],
 
     'info' => 'This plugin requires you to confirm each paysafecard payments manually.',
