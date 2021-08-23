@@ -46,7 +46,6 @@ class PaysafecardManualController extends Controller
             $embed = Embed::create()
                 ->title(trans('paysafecardmanual::messages.widget.pending'))
                 ->author($request->user()->name, null, $request->user()->getAvatar())
-                ->addField(trans('paysafecardmanual::messages.widget.pin'), $request->input('code'))
                 ->addField(trans('paysafecardmanual::messages.widget.user'), $request->user()->name)
                 ->color('#004de6')
                 ->footer('Azuriom v' . Azuriom::version())
