@@ -2,6 +2,9 @@
 
 namespace Azuriom\Plugin\PaysafecardManual\Controllers\Admin;
 
+use Azuriom\Azuriom;
+use Azuriom\Support\Discord\DiscordWebhook;
+use Azuriom\Support\Discord\Embed;
 use Azuriom\Http\Controllers\Controller;
 use Azuriom\Notifications\AlertNotification;
 use Azuriom\Plugin\PaysafecardManual\Models\PendingCode;
@@ -43,7 +46,7 @@ class AdminController extends Controller
             'transaction_id' => $code->code,
         ]);
 
-        ActionLog::log(trans('paysafecardmanual::messages.status.accepted').' ('.$price.' | '.$money.')', $code->user);
+        ActionLog::log(trans('paysafecardmanual::messages.status.accepted') . ' (' . $price . ' | ' . $money . ')', $code->user);
 
         $code->user->addMoney($money);
 
@@ -57,6 +60,23 @@ class AdminController extends Controller
 
         $code->user->notifications()->create($notification->toArray());
 
+        if (($webhookUrl = setting('shop.webhook')) !== null) {
+            $embed = Embed::create()
+                ->title(trans('paysafecardmanual::messages.widget.accepted'))
+                ->author($code->user->name, null, $code->user->getAvatar())
+                ->addField(trans('paysafecardmanual::messages.widget.pin'), $code->code)
+                ->addField(trans('paysafecardmanual::messages.widget.money'), $price . " " . currency())
+                ->addField(trans('paysafecardmanual::messages.widget.amount'), format_money($money))
+                ->addField(trans('paysafecardmanual::messages.widget.user'), $code->user->name)
+                ->color('#004de6')
+                ->footer('Azuriom v' . Azuriom::version())
+                ->timestamp(now());
+
+            rescue(function () use ($embed, $webhookUrl) {
+                DiscordWebhook::create()->addEmbed($embed)->send($webhookUrl);
+            });
+        }
+
         return redirect()->route('paysafecardmanual.admin.index')->with([
             'success' => trans('paysafecardmanual::messages.status.accepted'),
         ]);
@@ -69,10 +89,24 @@ class AdminController extends Controller
         $notification = (new AlertNotification(trans('paysafecardmanual::messages.notifications.refused', [
             'code' => $code->code,
         ])))->level('warning');
-        
+
         ActionLog::log(trans('paysafecardmanual::messages.status.refused'), $code->user);
 
         $code->user->notifications()->create($notification->toArray());
+        if (($webhookUrl = setting('shop.webhook')) !== null) {
+            $embed = Embed::create()
+                ->title(trans('paysafecardmanual::messages.widget.refused'))
+                ->author($code->user->name, null, $code->user->getAvatar())
+                ->addField(trans('paysafecardmanual::messages.widget.pin'), $code->code)
+                ->addField(trans('paysafecardmanual::messages.widget.user'), $code->user->name)
+                ->color('#004de6')
+                ->footer('Azuriom v' . Azuriom::version())
+                ->timestamp(now());
+
+            rescue(function () use ($embed, $webhookUrl) {
+                DiscordWebhook::create()->addEmbed($embed)->send($webhookUrl);
+            });
+        }
 
         return redirect()->route('paysafecardmanual.admin.index')->with([
             'success' => trans('paysafecardmanual::messages.status.refused'),
