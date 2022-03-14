@@ -46,7 +46,7 @@
                                     <input type="hidden" name="money">
 
                                     <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="fas fa-check"></i> {{ trans('paysafecardmanual::messages.actions.accept') }}
+                                        <i class="bi bi-check-lg"></i> {{ trans('paysafecardmanual::messages.actions.accept') }}
                                     </button>
                                 </form>
 
@@ -54,7 +54,7 @@
                                     @csrf
 
                                     <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-times"></i> {{ trans('paysafecardmanual::messages.actions.refuse') }}
+                                        <i class="bi bi-x-lg"></i> {{ trans('paysafecardmanual::messages.actions.refuse') }}
                                     </button>
                                 </form>
                             </td>

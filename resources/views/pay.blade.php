@@ -23,7 +23,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> {{ trans('messages.actions.send') }}
+                        <i class="bi bi-save"></i> {{ trans('messages.actions.send') }}
                     </button>
                 </form>
             </div>
