@@ -2,8 +2,8 @@
     "id": "paysafecardmanual",
     "name": "PaysafecardManual",
     "description": "Manually accept paysafecard payments.",
-    "version": "0.3.0",
-    "url": "https:\/\/azuriom.com",
+    "version": "1.0.0",
+    "url": "https://github.com/AzuriomCommunity/Plugin-PaysafecardManual",
     "authors": [
         "Javdu10"
     ],
