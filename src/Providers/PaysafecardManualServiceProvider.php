@@ -73,12 +73,12 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
             'paysafecardmanual' => [
                 'name' => 'Paysafecard Manual ('.PendingCode::count().')',
                 'type' => 'dropdown',
-                'icon' => 'fas fa-chart-bar',
+                'icon' => 'bi bi-bar-chart-line',
                 'route' => 'paysafecardmanual.admin.*',
                 'items' => [
-                    'paysafecardmanual.admin.index' => 'paysafecardmanual::messages.nav.pending',
+                    'paysafecardmanual.admin.index' => trans('paysafecardmanual::messages.nav.pending'),
                 ],
-            ],
+            ]
         ];
     }
 }
