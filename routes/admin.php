@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 | as prefix. Now create something great!
 |
 */
+Route::middleware('can:paysafecardmanual.manage')->group(function () {
+    Route::get('/', 'AdminController@index')->name('index');
 
-Route::get('/', 'AdminController@index')->name('index');
-
-Route::post('/{code}/accept', 'AdminController@accept')->name('accept');
-Route::post('/{code}/refuse', 'AdminController@refuse')->name('refuse');
+    Route::post('/{code}/accept', 'AdminController@accept')->name('accept');
+    Route::post('/{code}/refuse', 'AdminController@refuse')->name('refuse');
+});

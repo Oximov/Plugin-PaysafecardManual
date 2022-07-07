@@ -3,6 +3,7 @@
 namespace Azuriom\Plugin\PaysafecardManual\Providers;
 
 use Azuriom\Extensions\Plugin\BasePluginServiceProvider;
+use Azuriom\Models\Permission;
 use Azuriom\Plugin\PaysafecardManual\PaysafecardManualMethod;
 use Azuriom\Plugin\Shop\Models\Payment;
 use Azuriom\Plugin\Shop\Models\PaymentItem;
@@ -47,6 +48,10 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
 
         $this->registerAdminNavigation();
 
+        Permission::registerPermissions([
+            'paysafecardmanual.manage' => 'paysafecardmanual::admin.permissions.manage',
+        ]);
+
         payment_manager()->registerPaymentMethod('paysafecardmanual', PaysafecardManualMethod::class);
     }
 
@@ -78,6 +83,7 @@ class PaysafecardManualServiceProvider extends BasePluginServiceProvider
                 'items' => [
                     'paysafecardmanual.admin.index' => trans('paysafecardmanual::messages.nav.pending'),
                 ],
+                'permission' => 'paysafecardmanual.manage'
             ]
         ];
     }
